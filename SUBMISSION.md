@@ -34,10 +34,8 @@ There are no passwords: choose an account on the sign-in screen.
 | `AI_WORKFLOW.md` | AI workflow note: tools, speed-ups, what I changed or rejected, verification |
 | `SUBMISSION.md` | This file |
 | `VIDEO_URL.txt` | Walkthrough video link |
-| `docs/screenshots/` | Editor, share dialog, "Shared with me" view, conflict handling |
-| `src/`, `public/`, `test/` | Source code: Node/Express backend, vanilla JS + Quill frontend, API tests |
-| `package.json`, `package-lock.json` | Dependencies (run `npm install`) |
-| `render.yaml`, `Dockerfile` | Deployment config |
+| Source code | `src/` (Express backend), `public/` (vanilla JS + Quill frontend), `test/` (API tests), `package.json`, `render.yaml`, `Dockerfile`. In the Drive folder these are under `source/`; in the GitHub repo they're at the root. |
+| On GitHub only | `docs/screenshots/` (editor, share dialog, "Shared with me", conflict handling), `package-lock.json`, the `.docx` test fixture. Binary and generated files are kept out of Drive. To run the tests, clone the repo. |
 
 ## Run locally
 
