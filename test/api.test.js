@@ -19,9 +19,9 @@ async function login(email) {
     method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email }),
   });
   assert.equal(res.status, 200);
-  const cookie = res.headers.get('set-cookie').split(';')[0];
+  const { token } = await res.json();
   const call = async (method, path, body) => {
-    const opts = { method, headers: { cookie } };
+    const opts = { method, headers: { authorization: `Bearer ${token}` } };
     if (body instanceof FormData) opts.body = body;
     else if (body !== undefined) {
       opts.headers['Content-Type'] = 'application/json';
@@ -174,4 +174,15 @@ test('upload: a real .docx keeps headings, emphasis and lists', async () => {
   assert.match(html, /<strong>bold<\/strong>/);
   assert.match(html, /<em>italic<\/em>/);
   assert.match(html, /<ul><li>First point<\/li><li>Second point<\/li><\/ul>/);
+});
+
+test('sessions are independent: signing in as Bob does not change who Alice is', async () => {
+  const alice = await login('alice@ajaia.test');
+  const bob = await login('bob@ajaia.test');
+  assert.equal((await alice.get('/api/me')).body.user.email, 'alice@ajaia.test');
+  assert.equal((await bob.get('/api/me')).body.user.email, 'bob@ajaia.test');
+
+  await bob.post('/api/logout');
+  assert.equal((await bob.get('/api/me')).status, 401, 'logged-out token is revoked');
+  assert.equal((await alice.get('/api/me')).status, 200, 'other sessions are unaffected');
 });

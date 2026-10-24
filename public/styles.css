@@ -78,7 +78,9 @@ main { max-width: 960px; margin: 0 auto; padding: 1.5rem 1rem 4rem; }
 .paper { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: 0 1px 3px rgba(0,0,0,.04); }
 .paper .ql-toolbar.ql-snow { border: 0; border-bottom: 1px solid var(--border); position: sticky; top: 49px; background: var(--surface); z-index: 5; border-radius: var(--radius) var(--radius) 0 0; }
 .paper .ql-container.ql-snow { border: 0; font: inherit; font-size: 1rem; }
-.paper .ql-editor { min-height: 60vh; padding: 2rem 3rem; line-height: 1.6; }
+.paper .ql-editor { --page-x: 3rem; min-height: 60vh; padding: 2rem var(--page-x); line-height: 1.6; }
+/* Quill puts the placeholder 15px from the edge; line it up with the caret. */
+.paper .ql-editor.ql-blank::before { left: var(--page-x); right: var(--page-x); font-style: normal; color: #9aa4b2; }
 .paper .ql-editor h1 { font-size: 1.9rem; margin: 1rem 0 .5rem; }
 .paper .ql-editor h2 { font-size: 1.45rem; color: inherit; text-transform: none; letter-spacing: 0; margin: 1rem 0 .5rem; }
 .paper .ql-editor h3 { font-size: 1.15rem; margin: .75rem 0 .4rem; }
@@ -102,7 +104,7 @@ dialog h3 { font-size: .9rem; margin-top: 1.25rem; color: var(--muted); }
 .toast-success { background: #18794e; }
 
 @media (max-width: 640px) {
-  .paper .ql-editor { padding: 1.25rem; }
+  .paper .ql-editor { --page-x: 1.25rem; padding: 1.25rem var(--page-x); }
   .owner-line { margin-left: 0; }
   .user-menu #user-name { display: none; }
 }

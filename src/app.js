@@ -1,5 +1,4 @@
 const express = require('express');
-const cookieParser = require('cookie-parser');
 const multer = require('multer');
 const crypto = require('node:crypto');
 const path = require('node:path');
@@ -9,7 +8,6 @@ const {
 } = require('./content');
 
 const MAX_UPLOAD_BYTES = 5 * 1024 * 1024;
-const SESSION_COOKIE = 'ajaia_session';
 
 class HttpError extends Error {
   constructor(status, message, extra) {
@@ -24,7 +22,6 @@ function createApp(db) {
   const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: MAX_UPLOAD_BYTES, files: 1 } });
 
   app.use(express.json({ limit: '2mb' }));
-  app.use(cookieParser());
 
   // ---- data access -------------------------------------------------------
 
@@ -114,6 +111,11 @@ function createApp(db) {
   }
 
   // ---- auth (mocked: pick a seeded account, no password) ------------------
+  // Sessions are bearer tokens the client keeps per browser tab (sessionStorage),
+  // not a cookie: a cookie is shared by every tab, so signing in as Bob in one tab
+  // would silently turn an open "Alice" tab into Bob. Per-tab sessions also let a
+  // reviewer test sharing with two users side by side in one browser.
+  const bearer = (req) => /^Bearer (\w+)$/.exec(req.get('authorization') ?? '')?.[1];
 
   app.post('/api/login', (req, res) => {
     const email = String(req.body?.email ?? '').trim().toLowerCase();
@@ -121,22 +123,20 @@ function createApp(db) {
     if (!user) throw new HttpError(401, 'Unknown account. Use one of the demo accounts.');
     const token = crypto.randomBytes(24).toString('hex');
     q.createSession.run(token, user.id);
-    res.cookie(SESSION_COOKIE, token, { httpOnly: true, sameSite: 'lax', secure: req.secure, maxAge: 30 * 86400e3 });
-    res.json({ user });
+    res.json({ user, token });
   });
 
   app.get('/api/demo-users', (req, res) => res.json({ users: q.allUsers.all() }));
 
   app.use('/api', (req, res, next) => {
-    const token = req.cookies[SESSION_COOKIE];
+    const token = bearer(req);
     req.user = token ? q.userBySession.get(token) : undefined;
     if (!req.user) throw new HttpError(401, 'Not signed in');
     next();
   });
 
   app.post('/api/logout', (req, res) => {
-    q.deleteSession.run(req.cookies[SESSION_COOKIE]);
-    res.clearCookie(SESSION_COOKIE);
+    q.deleteSession.run(bearer(req));
     res.json({ ok: true });
   });
 

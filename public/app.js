@@ -4,11 +4,27 @@ const SAVE_DEBOUNCE_MS = 800;
 
 let me = null;
 let teardown = null; // cleanup for the current view (flushes unsaved edits)
+let currentView = null;
+
+// The session token lives in sessionStorage, so each tab has its own sign-in
+// (Alice in one tab, Bob in another) and survives a refresh of that tab.
+const TOKEN_KEY = 'ajaia-session';
+function getToken() {
+  try { return sessionStorage.getItem(TOKEN_KEY); } catch { return null; }
+}
+function setToken(token) {
+  try {
+    if (token) sessionStorage.setItem(TOKEN_KEY, token);
+    else sessionStorage.removeItem(TOKEN_KEY);
+  } catch { /* storage unavailable: session lasts until reload */ }
+}
+let memoryToken = getToken();
 
 // ---- helpers --------------------------------------------------------------
 
 async function api(path, { method = 'GET', body, form } = {}) {
   const opts = { method, headers: {} };
+  if (memoryToken) opts.headers.Authorization = `Bearer ${memoryToken}`;
   if (form) opts.body = form;
   else if (body !== undefined) {
     opts.headers['Content-Type'] = 'application/json';
@@ -21,6 +37,14 @@ async function api(path, { method = 'GET', body, form } = {}) {
     throw Object.assign(new Error('Network error. Check your connection.'), { status: 0 });
   }
   const data = res.status === 204 ? {} : await res.json().catch(() => ({}));
+  if (res.status === 401 && path !== '/api/login' && me) {
+    // Session ended (signed out elsewhere, or the server's data was reset).
+    memoryToken = null;
+    setToken(null);
+    me = null;
+    data.error = 'Your session ended. Please sign in again.';
+    setTimeout(route);
+  }
   if (!res.ok) throw Object.assign(new Error(data.error || `Request failed (${res.status})`), { status: res.status, data });
   return data;
 }
@@ -64,9 +88,10 @@ const ROLE_LABEL = { owner: 'Owner', editor: 'Can edit', viewer: 'View only' };
 
 async function route() {
   if (teardown) { await teardown(); teardown = null; }
-  if (!me) {
+  if (!me && memoryToken) {
     try { ({ user: me } = await api('/api/me')); } catch { me = null; }
   }
+  currentView = null;
   document.getElementById('user-menu').hidden = !me;
   if (me) document.getElementById('user-name').textContent = `${me.name} (${me.email})`;
   if (!me) return renderLogin();
@@ -81,6 +106,8 @@ document.getElementById('logout').addEventListener('click', async () => {
   if (teardown) { await teardown(); teardown = null; }
   await api('/api/logout', { method: 'POST' }).catch(() => {});
   me = null;
+  memoryToken = null;
+  setToken(null);
   location.hash = '#/';
   route();
 });
@@ -96,7 +123,10 @@ async function renderLogin() {
       class: 'btn btn-secondary login-user',
       onclick: async () => {
         try {
-          ({ user: me } = await api('/api/login', { method: 'POST', body: { email: u.email } }));
+          const { user, token } = await api('/api/login', { method: 'POST', body: { email: u.email } });
+          me = user;
+          memoryToken = token;
+          setToken(token);
           route();
         } catch (e) { toast(e.message, 'error'); }
       },
@@ -106,8 +136,14 @@ async function renderLogin() {
 
 // ---- home -----------------------------------------------------------------
 
+// Coming back to the list tab picks up documents shared or changed meanwhile.
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible' && currentView === 'home') renderHome();
+});
+
 async function renderHome() {
   const root = mount('tpl-home');
+  currentView = 'home';
   root.querySelector('[data-action=new]').addEventListener('click', async () => {
     try {
       const { document: doc } = await api('/api/documents', { method: 'POST', body: {} });
@@ -242,10 +278,10 @@ async function renderEditor(id) {
           halted = true;
           conflict.hidden = false;
           setStatus('Not saved: conflict');
-        } else if (e.status === 403 || e.status === 404) {
+        } else if (e.status === 401 || e.status === 403 || e.status === 404) {
           halted = true;
           setStatus('Not saved');
-          toast('You no longer have edit access to this document.', 'error');
+          toast(e.status === 401 ? e.message : 'You no longer have edit access to this document.', 'error');
         } else {
           setStatus(`Save failed: ${e.message} Retrying…`);
           timer = setTimeout(save, 3000);

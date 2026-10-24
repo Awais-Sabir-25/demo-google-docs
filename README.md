@@ -4,6 +4,8 @@ A lightweight collaborative document editor: create, format, upload, share and r
 
 **Live demo:** _add your deployment URL here_ · Sign in by picking a demo account (no password).
 
+**Each browser tab has its own sign-in**, so to test sharing open two tabs side by side, for example Alice in one and Bob in the other. A refresh keeps you signed in; a new tab asks you to pick an account.
+
 | Account | Purpose |
 | --- | --- |
 | `alice@ajaia.test` | Owns the seeded "Welcome to Ajaia Docs" document |
