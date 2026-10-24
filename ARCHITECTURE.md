@@ -31,11 +31,3 @@ There is one Node process and one SQLite file. The frontend has no build step: p
 ## Deliberately out of scope
 
 Real-time presence and co-editing, comments and suggestions, version history, images and tables, search, export, folders, invite emails, rate limiting, and production auth.
-
-## What I'd do next (in order)
-
-1. Version history: snapshot on save, with restore. Cheap given the existing `version` column, and it pairs well with conflict handling.
-2. Real-time co-editing with Yjs, storing the Yjs doc alongside the HTML snapshot.
-3. Real auth (OAuth), plus invite-by-email for users who don't exist yet.
-4. Export to `.docx`/PDF, and image support with object storage.
-5. Browser E2E tests in CI (Playwright). The flow was checked manually with a script for this submission.
