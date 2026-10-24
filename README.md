@@ -2,7 +2,7 @@
 
 A lightweight collaborative document editor: create, format, upload, share and reopen documents in the browser.
 
-**Live demo:** _add your deployment URL here_ · Sign in by picking a demo account (no password).
+**Live demo:** LIVE_URL_HERE (Render free plan: the first load after idle can take ~30–60 s) · Sign in by picking a demo account (no password).
 
 **Each browser tab has its own sign-in**, so to test sharing open two tabs side by side, for example Alice in one and Bob in the other. A refresh keeps you signed in; a new tab asks you to pick an account.
 
@@ -79,4 +79,4 @@ See [ARCHITECTURE.md](ARCHITECTURE.md) for design decisions and tradeoffs.
 
 ## AI usage
 
-I built this with an AI coding assistant (Claude Code) for scaffolding, boilerplate and test writing. These decisions were mine, and I checked the results myself: scope cuts, the access model (404 for documents you can't see, owner-only sharing), sanitizing on the server instead of trusting the editor, and optimistic concurrency instead of real-time sync. Every behavior listed above is covered by the tests or was checked in a real browser.
+See [AI_WORKFLOW.md](AI_WORKFLOW.md). For the submission contents, links and test accounts, see [SUBMISSION.md](SUBMISSION.md).
