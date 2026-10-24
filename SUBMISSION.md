@@ -4,8 +4,8 @@
 
 | | |
 | --- | --- |
-| **Live app** | LIVE_URL_HERE |
-| **Walkthrough video** | VIDEO_URL_HERE (also in `VIDEO_URL.txt`) |
+| **Live app** | https://ajaia-docs-v46b.onrender.com |
+| **Walkthrough video** | https://www.loom.com/share/6d082a605b374e049667e0d509fdd53e (also in `VIDEO_URL.txt`) |
 | **Source code** | https://github.com/Awais-Sabir-25/demo-google-docs (a copy is also in this folder) |
 
 > The live app runs on Render's free plan. **The first request after about 15 minutes of inactivity can take 30–60 s** while the server wakes up. A restart also resets the data to the seeded state, which keeps the demo accounts and sample document.

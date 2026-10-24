@@ -2,7 +2,7 @@
 
 A lightweight collaborative document editor: create, format, upload, share and reopen documents in the browser.
 
-**Live demo:** LIVE_URL_HERE (Render free plan: the first load after idle can take ~30–60 s) · Sign in by picking a demo account (no password).
+**Live demo:** https://ajaia-docs-v46b.onrender.com (Render free plan: the first load after idle can take ~30–60 s) · Sign in by picking a demo account (no password).
 
 **Each browser tab has its own sign-in**, so to test sharing open two tabs side by side, for example Alice in one and Bob in the other. A refresh keeps you signed in; a new tab asks you to pick an account.
 
