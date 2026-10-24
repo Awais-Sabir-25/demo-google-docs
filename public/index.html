@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ajaia Docs</title>
+  <link rel="stylesheet" href="/vendor/quill/quill.snow.css">
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <a href="#/" class="brand"><span class="logo">A</span> Ajaia Docs</a>
+    <div id="user-menu" class="user-menu" hidden>
+      <span id="user-name"></span>
+      <button id="logout" class="btn btn-ghost">Sign out</button>
+    </div>
+  </header>
+
+  <main id="view"></main>
+  <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+
+  <!-- Login -->
+  <template id="tpl-login">
+    <section class="login card">
+      <h1>Sign in</h1>
+      <p class="muted">Demo environment: choose a seeded account. No password needed.</p>
+      <div class="login-users"></div>
+    </section>
+  </template>
+
+  <!-- Document list -->
+  <template id="tpl-home">
+    <section class="home">
+      <div class="home-actions">
+        <button class="btn btn-primary" data-action="new">+ New document</button>
+        <label class="btn btn-secondary">
+          Upload file
+          <input type="file" accept=".txt,.md,.markdown,.docx" data-action="upload" hidden>
+        </label>
+        <span class="muted small">Upload turns a <b>.txt</b>, <b>.md</b> or <b>.docx</b> file (max 5 MB) into a new editable document.</span>
+      </div>
+      <h2>My documents</h2>
+      <ul class="doc-list" data-list="owned"></ul>
+      <h2>Shared with me</h2>
+      <ul class="doc-list" data-list="shared"></ul>
+    </section>
+  </template>
+
+  <!-- Editor -->
+  <template id="tpl-editor">
+    <section class="editor-page">
+      <div class="editor-header">
+        <a href="#/" class="btn btn-ghost" title="Back to documents">&larr;</a>
+        <input class="title-input" maxlength="200" aria-label="Document title">
+        <span class="badge" data-role></span>
+        <span class="save-status muted small" aria-live="polite"></span>
+        <div class="spacer"></div>
+        <label class="btn btn-secondary" data-edit-only title="Insert a .txt, .md or .docx file at the cursor">
+          Import file
+          <input type="file" accept=".txt,.md,.markdown,.docx" data-action="import" hidden>
+        </label>
+        <button class="btn btn-primary" data-action="share" hidden>Share</button>
+      </div>
+      <div class="conflict card" hidden>
+        <strong>Someone else changed this document.</strong>
+        Your latest edits were not saved.
+        <button class="btn btn-secondary" data-action="reload">Load their version</button>
+        <button class="btn btn-ghost" data-action="overwrite">Keep mine (overwrite)</button>
+      </div>
+      <p class="owner-line muted small"></p>
+      <div class="paper">
+        <div id="toolbar">
+          <span class="ql-formats">
+            <select class="ql-header">
+              <option value="1">Heading 1</option>
+              <option value="2">Heading 2</option>
+              <option value="3">Heading 3</option>
+              <option selected>Normal</option>
+            </select>
+          </span>
+          <span class="ql-formats">
+            <button class="ql-bold" title="Bold (Ctrl+B)"></button>
+            <button class="ql-italic" title="Italic (Ctrl+I)"></button>
+            <button class="ql-underline" title="Underline (Ctrl+U)"></button>
+            <button class="ql-strike" title="Strikethrough"></button>
+          </span>
+          <span class="ql-formats">
+            <button class="ql-list" value="ordered" title="Numbered list"></button>
+            <button class="ql-list" value="bullet" title="Bulleted list"></button>
+            <button class="ql-blockquote" title="Quote"></button>
+            <button class="ql-link" title="Link"></button>
+          </span>
+          <span class="ql-formats"><button class="ql-clean" title="Clear formatting"></button></span>
+        </div>
+        <div id="editor"></div>
+      </div>
+    </section>
+  </template>
+
+  <!-- Share dialog -->
+  <dialog id="share-dialog">
+    <form method="dialog" class="share-form">
+      <h2>Share document</h2>
+      <div class="share-add">
+        <select name="email" aria-label="Person" required></select>
+        <select name="role" aria-label="Access level">
+          <option value="editor">Can edit</option>
+          <option value="viewer">Can view</option>
+        </select>
+        <button class="btn btn-primary" value="add" data-action="add-share">Share</button>
+      </div>
+      <p class="error small" hidden></p>
+      <h3>People with access</h3>
+      <ul class="share-list"></ul>
+      <div class="dialog-footer"><button class="btn btn-secondary" value="close">Done</button></div>
+    </form>
+  </dialog>
+
+  <script src="/vendor/quill/quill.js"></script>
+  <script type="module" src="/app.js"></script>
+</body>
+</html>

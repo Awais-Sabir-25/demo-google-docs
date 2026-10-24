@@ -1,0 +1,14 @@
+# Render Blueprint: New > Blueprint > point at this repo.
+services:
+  - type: web
+    name: ajaia-docs
+    runtime: node
+    plan: free
+    buildCommand: npm ci --omit=dev
+    startCommand: npm start
+    healthCheckPath: /api/demo-users
+    envVars:
+      - key: NODE_VERSION
+        value: 22.22.0
+      # Free plan has no persistent disk, so data resets on redeploy/idle restart.
+      # On a paid plan, add a disk mounted at /data and set DB_PATH=/data/ajaia.db.
